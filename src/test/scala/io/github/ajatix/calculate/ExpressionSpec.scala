@@ -20,7 +20,7 @@ class ExpressionSpec extends FlatSpec {
   it should "evaluate Expression" in {
     val e1 = Add(Number(5), Multiply(Number(4), Number(3)))
 
-    assert(e1.evaluate() == Left(Number(17)))
+    assert(e1.evaluate() == Number(17))
   }
 
   it should "calculate cost of evaluating the Expression" in {
@@ -53,7 +53,7 @@ class ExpressionSpec extends FlatSpec {
     val e1 = Add(Number(3), Divide(Number(4), Number(0)))
     val o1 = Add(Number(3), DivideByZero)
 
-    assert(e1.evaluate() == Right(o1))
+    assert(e1.evaluate() == o1)
   }
 
   it should "parse natural input" in {
@@ -76,7 +76,7 @@ class ExpressionSpec extends FlatSpec {
     val e1 = 4 into 10 plus 3 minus 8 plus 2 by 2
     val o1 = Number(36)
 
-    assert(e1.reorder().evaluate() == Left(o1))
+    assert(e1.reorder().evaluate() == o1)
   }
 
 }

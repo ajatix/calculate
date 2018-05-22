@@ -181,7 +181,10 @@ object ExpressionDSL {
   import Expression._
 
   implicit class RichExpression(e: Expression) {
-    def evaluate(): Result = evaluateExpression(e)
+    def evaluate(): Expression = evaluateExpression(e) match {
+      case Left(n) => n
+      case Right(e) => e
+    }
     def cost(): Int = calculateCost(e)
     def optimize(): Expression = optimizeExpression(e)
     def reorder(): Expression = cleanExpression(e)
