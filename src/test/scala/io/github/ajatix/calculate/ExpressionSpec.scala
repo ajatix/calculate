@@ -56,4 +56,27 @@ class ExpressionSpec extends FlatSpec {
     assert(e1.evaluate() == Right(o1))
   }
 
+  it should "parse natural input" in {
+    val e1 = 3 plus 4 by 2 into 5 minus 1
+    val o1 = Subtract(Multiply(Divide(Add(Number(3), Number(4)), Number(2)), Number(5)), Number(1))
+
+    assert(e1 eq o1)
+  }
+
+  it should "reorder natural input based on BODMAS rules" in {
+    // 3 + (4 * 6 * 8) + (3 / 1)
+    val e1 = 3 plus 4 into 6 into 8 plus 3 by 1
+    val o1 = Add(Add(Number(3), Multiply(Multiply(Number(4), Number(6)), Number(8))), Divide(Number(3), Number(1)))
+
+    assert(e1.reorder() eq o1)
+  }
+
+  it should "evaluate natural input" in {
+    // (4 * 10) + 3 - 8 + (2 / 2) => 40 - 5 + 1 => 36
+    val e1 = 4 into 10 plus 3 minus 8 plus 2 by 2
+    val o1 = Number(36)
+
+    assert(e1.reorder().evaluate() == Left(o1))
+  }
+
 }

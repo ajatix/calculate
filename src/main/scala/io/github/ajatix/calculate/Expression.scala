@@ -146,6 +146,35 @@ object Expression {
     case e: Divide => optimizeDivide(e)
   }
 
+  def clean(e: Expression): Expression = e match {
+    case Multiply(Add(a, b), c) => Add(clean(a), Multiply(clean(b), clean(c)))
+    case Multiply(Subtract(a, b), c) => Subtract(clean(a), Multiply(clean(b), clean(c)))
+    case Multiply(a, b) => Multiply(clean(a), clean(b))
+    case Divide(Add(a, b), c) => Add(clean(a), Divide(clean(b), clean(c)))
+    case Divide(Subtract(a, b), c) => Subtract(clean(a), Divide(clean(b), clean(c)))
+    case Divide(a, b) => Divide(clean(a), clean(b))
+    case Add(a, b) => Add(clean(a), clean(b))
+    case Subtract(a, b) => Subtract(clean(a), clean(b))
+    case exp: Expression => exp
+  }
+
+  def isCleaned(e: Expression): Boolean = e match {
+    case Multiply(a: Add, _) => false
+    case Multiply(a: Subtract, _) => false
+    case Multiply(a, b) => isCleaned(a) && isCleaned(b)
+    case Divide(a: Add, _) => false
+    case Divide(a: Subtract, _) => false
+    case Divide(a, b) => isCleaned(a) && isCleaned(b)
+    case Add(a, b) => isCleaned(a) && isCleaned(b)
+    case Subtract(a, b) => isCleaned(a) && isCleaned(b)
+    case _ => true
+  }
+
+  def cleanExpression(e: Expression): Expression = {
+    if (!isCleaned(e)) cleanExpression(clean(e))
+    else e
+  }
+
 }
 
 object ExpressionDSL {
@@ -155,6 +184,7 @@ object ExpressionDSL {
     def evaluate(): Result = evaluateExpression(e)
     def cost(): Int = calculateCost(e)
     def optimize(): Expression = optimizeExpression(e)
+    def reorder(): Expression = cleanExpression(e)
   }
 
   implicit def intToNumber(n: Int): Number = Number(n)
