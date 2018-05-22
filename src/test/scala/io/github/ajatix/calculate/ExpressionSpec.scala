@@ -1,5 +1,6 @@
 package io.github.ajatix.calculate
 
+import io.github.ajatix.calculate.ExpressionDSL._
 import org.scalatest.FlatSpec
 
 class ExpressionSpec extends FlatSpec {
