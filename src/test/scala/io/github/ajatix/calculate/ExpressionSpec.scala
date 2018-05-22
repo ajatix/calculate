@@ -23,4 +23,12 @@ class ExpressionSpec extends FlatSpec {
     assert(e1.evaluate() == Number(17))
   }
 
+  it should "calculate cost of evaluating the Expression" in {
+    val e1 = Add(Number(4), Number(8))
+    val e2 = Multiply(Add(Number(6), Number(9)), Subtract(Number(1), Number(3)))
+
+    assert(e1.cost() == 1)
+    assert(e2.cost() == 3)
+  }
+
 }
