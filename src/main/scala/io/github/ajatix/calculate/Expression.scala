@@ -130,6 +130,7 @@ object Expression {
     case Divide(x, Number(0)) => DivideByZero
     case Divide(Number(0), y) => Number(0)
     case Divide(x, Number(1)) => x
+    case Divide(x, y) if x eq y => Number(1)
     case Divide(x, Multiply(y, z)) if x eq y => Divide(Number(1), z)
     case Divide(x, Multiply(y, z)) if x eq z => Divide(Number(1), y)
     case Divide(Multiply(x, y), z) if x eq z => y
