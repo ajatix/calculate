@@ -7,6 +7,15 @@ sealed trait Expression {
   def minus(v: Expression): Subtract = Subtract(this, v)
   def into(v: Expression): Multiply = Multiply(this, v)
   def by(v: Expression): Divide = Divide(this, v)
+
+  def unary_- : Expression = this match {
+    case Number(n) => Number(-n)
+    case DivideByZero => DivideByZero
+    case Add(x, y) => Add(-x, -y)
+    case Subtract(x, y) => Subtract(y, x)
+    case Multiply(x, y) => Multiply(-x, y)
+    case Divide(x, y) => Divide(-x, y)
+  }
 }
 
 case class Number(n: Int) extends Expression {
@@ -103,16 +112,23 @@ object Expression {
     case Add(x, Number(0)) => x
     case Add(Number(0), y) => y
     case Add(x, y) if x eq y => Multiply(Number(2), x)
+    case Add(x, y) if x eq -y => Number(0)
     case Add(x, Subtract(y, z)) if x eq z => y
+    case Add(x, Subtract(y, z)) if x eq -y => -z
     case Add(Subtract(x, y), z) if y eq z => x
+    case Add(Subtract(x, y), z) if x eq -z => -y
     case Add(x, y) => Add(optimizeExpression(x), optimizeExpression(y))
   }
 
   def optimizeSubtract(e: Subtract): Expression = e match {
     case Subtract(x, Number(0)) => x
+    case Subtract(Number(0), y) => -y
     case Subtract(x, y) if x eq y => Number(0)
+    case Subtract(x, y) if x eq -y => Multiply(Number(2), x)
     case Subtract(Add(x, y), z) if x eq z => y
     case Subtract(Add(x, y), z) if y eq z => x
+    case Subtract(x, Add(y, z)) if x eq y => -z
+    case Subtract(x, Add(y, z)) if x eq z => -y
     case Subtract(x, y) => Subtract(optimizeExpression(x), optimizeExpression(y))
   }
 

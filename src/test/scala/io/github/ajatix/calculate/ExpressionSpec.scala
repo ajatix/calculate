@@ -79,4 +79,18 @@ class ExpressionSpec extends FlatSpec {
     assert(e1.reorder().evaluate() == o1)
   }
 
+  it should "evaluate negative expression" in {
+    val e1 = -Add(3, 5)
+    val o1 = Number(-8)
+
+    assert(e1.evaluate() eq o1)
+  }
+
+  it should "parse natural input with negation" in {
+    val e1 = 3 plus -4 into 5
+    val o1 = Number(-17)
+
+    assert(e1.reorder().optimize().evaluate() eq o1)
+  }
+
 }
