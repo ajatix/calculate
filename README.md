@@ -10,7 +10,7 @@ Add the following to your `build.sbt`
 ```scala
 resolvers += Resolver.bintrayRepo("ajatix", "scala")
 
-libraryDependencies += "io.github.ajatix" %% "calculate" % "0.2"
+libraryDependencies += "io.github.ajatix" %% "calculate" % "0.3"
 ```
 
 In your main application, your can run the following
