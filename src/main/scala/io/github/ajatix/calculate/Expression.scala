@@ -62,37 +62,32 @@ case object DivideByZero extends Expression {
 
 object Expression {
 
-  type Result = Either[Number, Expression]
+  type Result = Expression
 
   private def add(x: Result, y: Result): Result = (x, y) match {
-    case (Left(Number(a)), Left(Number(b))) => Left(Number(a + b))
-    case (Left(a), Right(b)) => Right(Add(a, b))
-    case (Right(a), Left(b)) => Right(Add(a, b))
-    case (Right(a), Right(b)) => Right(Add(a, b))
+    case (Number(a), Number(b)) => Number(a + b)
+    case _ => Add(x, y)
   }
+
   private def subtract(x: Result, y: Result): Result = (x, y) match {
-    case (Left(Number(a)), Left(Number(b))) => Left(Number(a - b))
-    case (Left(a), Right(b)) => Right(Subtract(a, b))
-    case (Right(a), Left(b)) => Right(Subtract(a, b))
-    case (Right(a), Right(b)) => Right(Subtract(a, b))
+    case (Number(a), Number(b)) => Number(a - b)
+    case _ => Subtract(x, y)
   }
+
   private def multiply(x: Result, y: Result): Result = (x, y) match {
-    case (Left(Number(a)), Left(Number(b))) => Left(Number(a * b))
-    case (Left(a), Right(b)) => Right(Multiply(a, b))
-    case (Right(a), Left(b)) => Right(Multiply(a, b))
-    case (Right(a), Right(b)) => Right(Multiply(a, b))
+    case (Number(a), Number(b)) => Number(a * b)
+    case _ => Multiply(x, y)
   }
+
   private def divide(x: Result, y: Result): Result = (x, y) match {
-    case (Left(Number(a)), Left(Number(0))) => Right(DivideByZero)
-    case (Left(Number(a)), Left(Number(b))) => Left(Number(a / b))
-    case (Left(a), Right(b)) => Right(Divide(a, b))
-    case (Right(a), Left(b)) => Right(Divide(a, b))
-    case (Right(a), Right(b)) => Right(Divide(a, b))
+    case (Number(a), Number(0)) => DivideByZero
+    case (Number(a), Number(b)) => Number(a / b)
+    case _ => Divide(x, y)
   }
 
   def evaluateExpression(e: Expression): Result = e match {
-    case n: Number => Left(n)
-    case DivideByZero => Right(DivideByZero)
+    case n: Number => n
+    case DivideByZero => DivideByZero
     case Add(x, y) => add(evaluateExpression(x), evaluateExpression(y))
     case Subtract(x, y) => subtract(evaluateExpression(x), evaluateExpression(y))
     case Multiply(x, y) => multiply(evaluateExpression(x), evaluateExpression(y))
@@ -198,10 +193,7 @@ object ExpressionDSL {
   import Expression._
 
   implicit class RichExpression(e: Expression) {
-    def evaluate(): Expression = evaluateExpression(e) match {
-      case Left(n) => n
-      case Right(e) => e
-    }
+    def evaluate(): Expression = evaluateExpression(e)
     def cost(): Int = calculateCost(e)
     def optimize(): Expression = optimizeExpression(e)
     def reorder(): Expression = cleanExpression(e)
